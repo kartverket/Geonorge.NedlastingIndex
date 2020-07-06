@@ -22,17 +22,11 @@ namespace Geonorge.NedlastingIndex.Controllers
         }
 
         [HttpGet]
-        public string Get()
-        {
-            return "searchindex"; //Todo get searchresult
-        }
-
-        [HttpGet("startindexing", Name = "StartIndexing")]
-        public async Task<ActionResult> StartIndexing()
+        public async Task<ActionResult> Get()
         {
             await _feedIndexer.Index(new AtomFeed() { Url = "https://nedlasting.geonorge.no/geonorge/Tjenestefeed.xml" });
 
-            return RedirectToAction(nameof(Get));
+            return RedirectToAction("get","search");
         }
     }
 }

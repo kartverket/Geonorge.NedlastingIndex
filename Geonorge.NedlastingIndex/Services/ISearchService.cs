@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Geonorge.NedlastingIndex.Models;
+using Microsoft.AspNetCore.Mvc;
+using Nest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Geonorge.NedlastingIndex.Services
 {
-    interface ISearchService
+    public interface ISearchService
     {
+        List<Document> Search();
     }
 }

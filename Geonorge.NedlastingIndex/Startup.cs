@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Geonorge.NedlastingIndex.Services;
 using Geonorge.NedlastingIndex.Services.Index;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +39,7 @@ namespace Geonorge.NedlastingIndex
 
             services.AddTransient<IFeedIndexer, AtomFeedIndexer>();
             services.AddTransient<IDocumentIndexer, ElasticDocumentIndexer>();
+            services.AddTransient<ISearchService, SearchService>();
 
         }
 
