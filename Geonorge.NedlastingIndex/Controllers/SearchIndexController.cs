@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Geonorge.NedlastingIndex.Models;
+using Geonorge.NedlastingIndex.Services.Index;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Routing;
+using Serilog;
 
 namespace Geonorge.NedlastingIndex.Controllers
 {
@@ -11,17 +14,25 @@ namespace Geonorge.NedlastingIndex.Controllers
     [Route("[controller]")]
     public class SearchIndexController : ControllerBase
     {
-        private readonly ILogger<SearchIndexController> _logger;
+        private readonly IFeedIndexer _feedIndexer;
 
-        public SearchIndexController(ILogger<SearchIndexController> logger)
+        public SearchIndexController(IFeedIndexer feedIndexer)
         {
-            _logger = logger;
+            _feedIndexer = feedIndexer;
         }
 
         [HttpGet]
         public string Get()
         {
-            return "searchindex";
+            return "searchindex"; //Todo get searchresult
+        }
+
+        [HttpGet("startindexing", Name = "StartIndexing")]
+        public async Task<ActionResult> StartIndexing()
+        {
+            await _feedIndexer.Index(new AtomFeed() { Url = "https://nedlasting.geonorge.no/geonorge/Tjenestefeed.xml" });
+
+            return RedirectToAction(nameof(Get));
         }
     }
 }
