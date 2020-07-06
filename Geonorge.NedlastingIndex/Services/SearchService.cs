@@ -12,7 +12,7 @@ namespace Geonorge.NedlastingIndex.Services
         private readonly ElasticClient _client;
         public SearchService(AppSettings appSettings)
         {
-            var settings = new ConnectionSettings(new Uri("http://localhost:9200/")).DefaultIndex("nedlasting");
+            var settings = new ConnectionSettings(new Uri(appSettings.ElasticSearchHostname)).DefaultIndex(appSettings.ElasticSearchIndexName);
 
             _client = new ElasticClient(settings);
         }

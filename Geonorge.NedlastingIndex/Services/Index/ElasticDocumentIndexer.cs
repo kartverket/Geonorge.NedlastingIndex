@@ -16,7 +16,7 @@ namespace Geonorge.NedlastingIndex.Services.Index
 
         public ElasticDocumentIndexer(AppSettings appSettings)
         {
-            var settings = new ConnectionSettings(new Uri("http://localhost:9200/")).DefaultIndex("nedlasting");
+            var settings = new ConnectionSettings(new Uri(appSettings.ElasticSearchHostname)).DefaultIndex(appSettings.ElasticSearchIndexName);
 
             _client = new ElasticClient(settings);
         }
