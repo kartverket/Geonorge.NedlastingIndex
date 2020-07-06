@@ -23,9 +23,12 @@ namespace Geonorge.NedlastingIndex.Services.Index
 
         public async Task Index(Document document)
         {
+            Log.Debug("Indexing document with title: " + document.Title);
 
             var asyncIndexResponse = await _client.IndexDocumentAsync(document);
             await _client.IndexDocumentAsync(document);
+
+            Log.Debug("Response from indexing request: " + asyncIndexResponse.Result.GetStringValue());
         }
     }
 }
