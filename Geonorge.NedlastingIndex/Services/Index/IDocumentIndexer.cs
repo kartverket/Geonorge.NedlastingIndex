@@ -10,5 +10,6 @@ namespace Geonorge.NedlastingIndex.Services.Index
     {
         Task Index(Document document);
         Task CreateIndex();
+        Task CreateSample();
     }
 }

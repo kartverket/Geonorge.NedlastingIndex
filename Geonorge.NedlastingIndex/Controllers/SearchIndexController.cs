@@ -39,5 +39,13 @@ namespace Geonorge.NedlastingIndex.Controllers
 
             return Ok();
         }
+
+        [HttpGet("createsample")]
+        public async Task<ActionResult> CreateSample()
+        {
+            await _documentIndexer.CreateSample();
+
+            return Ok();
+        }
     }
 }
