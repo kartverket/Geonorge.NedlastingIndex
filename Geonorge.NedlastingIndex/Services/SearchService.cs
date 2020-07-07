@@ -19,7 +19,7 @@ namespace Geonorge.NedlastingIndex.Services
 
         public List<Document> Search() 
         { 
-
+            //Todo build dynamic query
             var searchResponse = _client.Search<Document>(s => s
             .From(0)
             .Size(10)

@@ -27,6 +27,7 @@ namespace Geonorge.NedlastingIndex.Controllers
         [HttpGet]
         public async Task<ActionResult> Get()
         {
+            //Todo index new feed https://nedlasting.geonorge.no/geonorge/ATOM/INSPIRE/Geonorge_INSPIRE_ServiceFeed.xml and ngu
             await _feedIndexer.Index(new AtomFeed() { Url = "https://nedlasting.geonorge.no/geonorge/Tjenestefeed.xml" });
 
             return RedirectToAction("get","search");

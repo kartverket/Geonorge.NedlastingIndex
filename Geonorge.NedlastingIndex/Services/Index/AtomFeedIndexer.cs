@@ -23,7 +23,7 @@ namespace Geonorge.NedlastingIndex.Services.Index
 
             foreach (var item in parsedRootFeed.Items)
             {
-                await _documentIndexer.Index(new Document()
+                await _documentIndexer.Index(new Document() // Todo index as Dataset
                 {
                     Title = item.Title,
                     Description = item.Description,

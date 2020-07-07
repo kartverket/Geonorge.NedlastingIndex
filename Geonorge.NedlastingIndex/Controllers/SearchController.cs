@@ -19,7 +19,7 @@ namespace Geonorge.NedlastingIndex.Controllers
             _searchService = searchService;
         }
 
-        public List<Document> Get() 
+        public List<Dataset> Get() 
         {
             return _searchService.Search();
         }

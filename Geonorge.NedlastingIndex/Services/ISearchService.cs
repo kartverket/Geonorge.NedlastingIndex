@@ -10,6 +10,6 @@ namespace Geonorge.NedlastingIndex.Services
 {
     public interface ISearchService
     {
-        List<Document> Search();
+        List<Dataset> Search();
     }
 }
