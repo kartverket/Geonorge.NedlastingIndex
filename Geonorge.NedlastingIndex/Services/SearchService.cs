@@ -17,10 +17,10 @@ namespace Geonorge.NedlastingIndex.Services
             _client = new ElasticClient(settings);
         }
 
-        public List<Document> Search() 
+        public List<Dataset> Search() 
         { 
             //Todo build dynamic query
-            var searchResponse = _client.Search<Document>(s => s
+            var searchResponse = _client.Search<Dataset>(s => s
             .From(0)
             .Size(10)
             );
