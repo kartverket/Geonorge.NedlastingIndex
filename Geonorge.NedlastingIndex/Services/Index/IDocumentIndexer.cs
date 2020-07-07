@@ -9,5 +9,6 @@ namespace Geonorge.NedlastingIndex.Services.Index
     public interface IDocumentIndexer
     {
         Task Index(Document document);
+        Task CreateIndex();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Geonorge.NedlastingIndex.Models;
 using Geonorge.NedlastingIndex.Services.Index;
@@ -15,10 +16,12 @@ namespace Geonorge.NedlastingIndex.Controllers
     public class SearchIndexController : ControllerBase
     {
         private readonly IFeedIndexer _feedIndexer;
+        private readonly IDocumentIndexer _documentIndexer;
 
-        public SearchIndexController(IFeedIndexer feedIndexer)
+        public SearchIndexController(IFeedIndexer feedIndexer, IDocumentIndexer documentIndexer)
         {
             _feedIndexer = feedIndexer;
+            _documentIndexer = documentIndexer;
         }
 
         [HttpGet]
@@ -27,6 +30,14 @@ namespace Geonorge.NedlastingIndex.Controllers
             await _feedIndexer.Index(new AtomFeed() { Url = "https://nedlasting.geonorge.no/geonorge/Tjenestefeed.xml" });
 
             return RedirectToAction("get","search");
+        }
+
+        [HttpGet("createindex")]
+        public async Task<ActionResult> CreateIndex()
+        {
+            await _documentIndexer.CreateIndex();
+
+            return Ok();
         }
     }
 }
