@@ -23,13 +23,21 @@ namespace Geonorge.NedlastingIndex.Services
             //Todo handle input parameters
 
             string metadataUuid = "4b6da2fb-67f9-4cab-ad18-ae064eb135e1";
-            QueryContainer datasetFiler = null;
-            if(!string .IsNullOrEmpty(metadataUuid))
-                datasetFiler = new QueryContainerDescriptor<Dataset>()
+            string title = "bygningspunkt";
+
+            QueryContainer uuidFilter = null;
+            QueryContainer titleFilter = null;
+
+            if (!string .IsNullOrEmpty(metadataUuid))
+                uuidFilter = new QueryContainerDescriptor<Dataset>()
                 .Terms(c => c.Field(p => p.MetadataUuid).Terms(metadataUuid));
 
+            if (!string.IsNullOrEmpty(title))
+                titleFilter = new QueryContainerDescriptor<Dataset>()
+                .Terms(c => c.Field(p => p.Title).Terms(title));
+
             var searchResponse = _client.Search<Dataset>(s => s
-                .Query(q => + datasetFiler && q
+                .Query(q => +uuidFilter && titleFilter && q
                     .Nested(n => n
                         .InnerHits()
                         .Path(b => b.Files)
