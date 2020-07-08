@@ -34,9 +34,11 @@ namespace Geonorge.NedlastingIndex.Services
 
             if (!string.IsNullOrEmpty(title))
                 titleFilter = new QueryContainerDescriptor<Dataset>()
-                .Terms(c => c.Field(p => p.Title).Terms(title));
+                .Terms(c => c.Field(p => p.Title).Terms(title).Boost(2));
 
             var searchResponse = _client.Search<Dataset>(s => s
+                .IndicesBoost(b => b
+                .Add("title", 1.4))
                 .Query(q => +uuidFilter && titleFilter && q
                     .Nested(n => n
                         .InnerHits()
