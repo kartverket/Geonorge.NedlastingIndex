@@ -1,4 +1,5 @@
-﻿using Geonorge.NedlastingIndex.Models;
+﻿using Geonorge.NedlastingIndex.Controllers;
+using Geonorge.NedlastingIndex.Models;
 using Microsoft.AspNetCore.Mvc;
 using Nest;
 using System;
@@ -10,6 +11,6 @@ namespace Geonorge.NedlastingIndex.Services
 {
     public interface ISearchService
     {
-        List<Dataset> Search();
+        List<Dataset> Search(SearchParameters searchParameters);
     }
 }

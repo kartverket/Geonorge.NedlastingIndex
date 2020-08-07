@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Geonorge.NedlastingIndex.Models;
 using Geonorge.NedlastingIndex.Services;
 using Microsoft.AspNetCore.Http;
@@ -19,9 +20,15 @@ namespace Geonorge.NedlastingIndex.Controllers
             _searchService = searchService;
         }
 
-        public List<Dataset> Get() 
+        [HttpPost]
+        public List<Dataset> Get([FromBody] SearchParameters searchParameters) 
         {
-            return _searchService.Search();
+            return _searchService.Search(searchParameters);
+        }
+
+        public List<Dataset> Get()
+        {
+            return _searchService.Search(new SearchParameters());
         }
     }
 }

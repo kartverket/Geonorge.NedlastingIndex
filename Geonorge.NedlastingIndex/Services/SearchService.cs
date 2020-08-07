@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Geonorge.NedlastingIndex.Controllers;
 using Geonorge.NedlastingIndex.Models;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Nest;
@@ -18,12 +19,14 @@ namespace Geonorge.NedlastingIndex.Services
             _client = new ElasticClient(settings);
         }
 
-        public List<Dataset> Search() 
+        public List<Dataset> Search(SearchParameters searchParameters) 
         {
             //Todo handle input parameters
 
             string metadataUuid = "4b6da2fb-67f9-4cab-ad18-ae064eb135e1";
             string title = "bygningspunkt";
+            if (!string.IsNullOrEmpty(searchParameters.text))
+                title = searchParameters.text;
 
             QueryContainer uuidFilter = null;
             QueryContainer titleFilter = null;
