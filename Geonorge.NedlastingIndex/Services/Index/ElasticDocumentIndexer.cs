@@ -23,7 +23,7 @@ namespace Geonorge.NedlastingIndex.Services.Index
             _client = new ElasticClient(settings);
         }
 
-        public async Task Index(Document document)
+        public async Task Index(Dataset document)
         {
             Log.Debug("Indexing document with title: " + document.Title);
 

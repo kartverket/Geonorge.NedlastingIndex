@@ -8,7 +8,7 @@ namespace Geonorge.NedlastingIndex.Services.Index
 {
     public interface IDocumentIndexer
     {
-        Task Index(Document document);
+        Task Index(Dataset dataset);
         Task CreateIndex();
         Task CreateSample();
     }
