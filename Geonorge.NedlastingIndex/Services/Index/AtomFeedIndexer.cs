@@ -16,6 +16,7 @@ namespace Geonorge.NedlastingIndex.Services.Index
         private readonly IDocumentIndexer _documentIndexer;
 
         XNamespace ns = "http://www.w3.org/2005/Atom";
+        XNamespace gn = "http://geonorge.no/geonorge";
 
         public AtomFeedIndexer(IDocumentIndexer documentIndexer)
         {
@@ -32,21 +33,45 @@ namespace Geonorge.NedlastingIndex.Services.Index
                 var uuid = data.Element(ns + "uuid")?.Value;
 
                 Feed parsedDetailsFeed = await CodeHollow.FeedReader.FeedReader.ReadAsync(item.Id);
+
+                List<File> files = new List<File>();
+
                 foreach (var elements in parsedDetailsFeed.Items)
                 {
                     var entries = elements.SpecificItem.Element;
+
+                    var projection = entries.Element(ns + "category").Attribute("code")?.Value;
+
+                    var format = entries.Element(gn + "format")?.Value;
+
                     var links = entries.Elements(ns + "link").ToList();
+
+                    foreach(var link in links) 
+                    {
+                       var coverageType = link.Attribute(gn + "coveragetype")?.Value;
+
+                       var area = link.Attribute(gn + "coveragecode")?.Value;
+
+                       var url = link.Attribute("href")?.Value;
+
+                        files.Add(new File 
+                        { 
+                            CoverageType = coverageType,
+                            Area = area,
+                            Projection = projection,
+                            Format = format,
+                            Url = url
+                        });
+                    }
+
                 }
                     
 
                 var dataset = new Dataset()
                 {
                     Title = item.Title,
-                    MetadataUuid = uuid
-                    //MetadataUuid = item.GetGeonorgeFeedItem().InspireSpatialDatasetIdentifierCode,
-                    //Epsg = item.GetGeonorgeFeedItem().Epsg?.Value
-
-
+                    MetadataUuid = uuid,
+                    Files = files
                 };
                 await _documentIndexer.Index(dataset);
             }
