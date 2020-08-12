@@ -54,13 +54,16 @@ namespace Geonorge.NedlastingIndex.Services.Index
 
                        var url = link.Attribute("href")?.Value;
 
+                       var modified = link.Attribute("modified")?.Value;
+
                         files.Add(new File 
                         { 
                             CoverageType = coverageType,
                             Area = area,
                             Projection = projection,
                             Format = format,
-                            Url = url
+                            Url = url,
+                            Modified = modified
                         });
                     }
 

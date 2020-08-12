@@ -13,5 +13,7 @@ namespace Geonorge.NedlastingIndex.Models
         public string Format { get; set; }
         [Keyword]
         public string Url { get; set; }
+        [Date]
+        public string Modified { get; set; }
     }
 }
