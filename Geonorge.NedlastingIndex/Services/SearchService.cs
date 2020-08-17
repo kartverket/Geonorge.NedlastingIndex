@@ -66,7 +66,17 @@ namespace Geonorge.NedlastingIndex.Services
                                 )
                             )
                     )
-            );
+            .Aggregations(a => a 
+                    .Nested("files", nn => nn
+                        .Path(bb => bb.Files )
+                        .Aggregations(a => a
+                            .Terms("area", t => t.Field(s => s.Files.First().Area))
+                            .Terms("projection", t => t.Field(s => s.Files.First().Projection))
+                            .Terms("format", t => t.Field(s => s.Files.First().Format))
+                        )
+                )
+            ))
+                ;
             //Get only files matching
             foreach (var hit in searchResponse.Hits)
             {
