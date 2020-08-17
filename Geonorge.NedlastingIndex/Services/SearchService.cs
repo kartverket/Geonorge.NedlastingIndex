@@ -24,31 +24,31 @@ namespace Geonorge.NedlastingIndex.Services
 
             List<Dataset> datasets = new List<Dataset>();
             string text = searchParameters.text;
-            string coverageType = searchParameters.coveragetype;
-            string area = searchParameters.area;
-            string projection = searchParameters.projection;
-            string format = searchParameters.format;
+            string[] coverageTypes = searchParameters.coveragetypes;
+            string[] areas = searchParameters.areas;
+            string[] projections = searchParameters.projections;
+            string[] formats = searchParameters.formats;
 
             var filters = new List<Func<QueryContainerDescriptor<Dataset>, QueryContainer>>();
 
-            if (!string.IsNullOrEmpty(coverageType))
+            if (coverageTypes != null && coverageTypes.Length > 0)
             {
-                filters.Add(nq => nq.Match(m0 => m0.Field(f0 => f0.Files.First().CoverageType).Query(coverageType)));
+                filters.Add(nq => nq.Terms(m0 => m0.Field(f0 => f0.Files.First().CoverageType).Terms(coverageTypes)));
             }
 
-            if (!string.IsNullOrEmpty(area))
+            if (areas != null && areas.Length > 0)
             {
-                filters.Add(nq => nq.Match(m1 => m1.Field(f1 => f1.Files.First().Area).Query(area)));
+                filters.Add(nq => nq.Terms(m1 => m1.Field(f1 => f1.Files.First().Area).Terms(areas)));
             }
 
-            if (!string.IsNullOrEmpty(projection))
+            if (projections != null && projections.Length > 0)
             {
-                filters.Add(nq => nq.Match(m2 => m2.Field(f2 => f2.Files.First().Projection).Query(projection)));
+                filters.Add(nq => nq.Terms(m2 => m2.Field(f2 => f2.Files.First().Projection).Terms(projections)));
             }
 
-            if (!string.IsNullOrEmpty(format))
+            if (formats != null && formats.Length > 0)
             {
-                filters.Add(nq => nq.Match(m3 => m3.Field(f3 => f3.Files.First().Format).Query(format)));
+                filters.Add(nq => nq.Terms(m3 => m3.Field(f3 => f3.Files.First().Format).Terms(formats)));
             }
 
 
