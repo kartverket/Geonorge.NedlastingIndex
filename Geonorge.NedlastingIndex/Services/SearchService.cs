@@ -21,7 +21,7 @@ namespace Geonorge.NedlastingIndex.Services
 
         public List<Dataset> Search(SearchParameters searchParameters)
         {
-
+            int size = 10000;
             List<Dataset> datasets = new List<Dataset>();
             string text = searchParameters.text;
             string[] coverageTypes = searchParameters.coveragetypes;
@@ -53,6 +53,7 @@ namespace Geonorge.NedlastingIndex.Services
 
 
             var searchResponse = _client.Search<Dataset>(s => s
+                .Size(size)
                 .Query(q => q
                 .Match(m => m
                     .Field(t => t.Title)
@@ -66,18 +67,27 @@ namespace Geonorge.NedlastingIndex.Services
                                 )
                             )
                     )
-            .Aggregations(a => a 
-                    .Nested("files", nn => nn
-                        .Path(bb => bb.Files )
-                        .Aggregations(a => a
-                            .Terms("area", t => t.Field(s => s.Files.First().Area))
-                            .Terms("projection", t => t.Field(s => s.Files.First().Projection))
-                            .Terms("format", t => t.Field(s => s.Files.First().Format))
+
+                .Aggregations(a => a
+                    .Nested("capabilitiesGeneral", n => n
+                    .Path(p => p.Files)
+                    .Aggregations(a => a
+                        .Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
+                        .Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
+                        .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
                         )
+                    )
+                    .Terms("capabilitiesMetadata", t => t.Field(s => s.MetadataUuid).Size(size)
+                    .Aggregations(b => b
+                    .Nested("files", nn => nn
+                    .Path(pp => pp.Files).Aggregations(aa => aa
+                    .Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
+                    .Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
+                    .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
+                    ))))
                 )
-            ))
-                ;
-            //Get only files matching
+            );
+
             foreach (var hit in searchResponse.Hits)
             {
                 Dataset dataset = new Dataset();
