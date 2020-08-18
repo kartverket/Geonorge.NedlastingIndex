@@ -72,6 +72,7 @@ namespace Geonorge.NedlastingIndex.Services
                     .Nested("capabilitiesGeneral", n => n
                     .Path(p => p.Files)
                     .Aggregations(a => a
+                        .Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
                         .Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
                         .Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
                         .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
@@ -81,6 +82,7 @@ namespace Geonorge.NedlastingIndex.Services
                     .Aggregations(b => b
                     .Nested("files", nn => nn
                     .Path(pp => pp.Files).Aggregations(aa => aa
+                    .Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
                     .Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
                     .Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
                     .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
