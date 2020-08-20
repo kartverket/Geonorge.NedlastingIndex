@@ -51,13 +51,15 @@ namespace Geonorge.NedlastingIndex.Services
                 filters.Add(nq => nq.Terms(m3 => m3.Field(f3 => f3.Files.First().Format).Terms(formats)));
             }
 
+            if (!string.IsNullOrEmpty(text))
+                text = "*" + text + "*";
 
             var searchResponse = _client.Search<Dataset>(s => s
                 .Size(size)
                 .Query(q => q
-                .Match(m => m
+                .Wildcard(m => m
                     .Field(t => t.Title)
-                    .Query(text)
+                    .Value(text)
                 )
                 && q.Nested(n => n
                         .InnerHits()
