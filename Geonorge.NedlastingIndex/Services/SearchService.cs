@@ -62,7 +62,7 @@ namespace Geonorge.NedlastingIndex.Services
                     .Value(text)
                 )
                 && q.Nested(n => n
-                        .InnerHits()
+                        .InnerHits(ih => ih.From(0).Size(100))
                         .Path(b => b.Files)
                         .Query(nq => nq.Bool(bq => bq.Filter(filters))
 
