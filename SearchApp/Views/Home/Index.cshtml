@@ -1,0 +1,90 @@
+﻿@using Newtonsoft.Json.Linq;
+@model SearchApp.Controllers.SearchModel
+@{
+    ViewData["Title"] = "Massiv nedlsting";
+    var text = Model.parameters.SelectToken("text");
+
+    var areas = Model.parameters.SelectToken("areas");
+    var projections = Model.parameters.SelectToken("projections");
+    var formats = Model.parameters.SelectToken("formats");
+    var coveragetypes = Model.parameters.SelectToken("coverageTypes");
+
+    string CheckedFacet(string facet, string facetName)
+    {
+        if(!string.IsNullOrEmpty(facet) && !string.IsNullOrEmpty(facetName)) {
+            if (facet == "areas" && areas!= null)
+            {
+                if (areas.Any(t => t.Value<string>() == facetName))
+                    return "checked";
+            }
+            if (facet == "projections" && projections != null)
+            {
+                if (projections.Any(t => t.Value<string>() == facetName))
+                    return "checked";
+            }
+            if (facet == "coverageTypes" && coveragetypes != null)
+            {
+                if (coveragetypes.Any(t => t.Value<string>() == facetName))
+                    return "checked";
+            }
+            if (facet == "formats" && formats != null)
+            {
+                if (formats.Any(t => t.Value<string>() == facetName))
+                    return "checked";
+            }
+        }
+
+        return "";
+    }
+
+
+
+}
+<form asp-action="Search" id="form1">
+    <input type="text" name="text" value="@text" /><input type="submit" value="Søk" />
+    <table>
+        <tr>
+            <td valign="top">
+                @{
+                    var facets = Model.model.Property("facets");
+                    foreach (var facet in facets.Value)
+                    {
+                        var facetField = facet.SelectToken("facetField") + "s";
+                        var facetResults = facet.SelectToken("facetResults");
+
+                        <b>@facetField</b><br />
+
+                        foreach (var facetResult in facetResults)
+                        {
+                            var name = facetResult.SelectToken("name");
+                            var count = facetResult.SelectToken("count");
+
+                            <input type="checkbox" name="@facetField" @CheckedFacet(facetField, name?.ToString()) value="@name" onchange="document.getElementById('form1').submit();" /> @name @:<i>(@count)</i> <br />
+                        }
+                    }
+                }
+            </td>
+            <td valign="top">
+                @{
+                    var datasets = Model.model.Property("datasets");
+
+                    foreach (var dataset in datasets.Value)
+                    {
+                        var title = dataset.SelectToken("title");
+
+                        var files = dataset.SelectToken("files");
+
+                        <b>@title</b><ul>
+                            @foreach (var file in files)
+                            {
+                                var url = file.SelectToken("url");
+                                Uri uri = new Uri(url.ToString());
+                                <li><a href="@url">@uri.Segments.Last()</a></li>
+                            }
+                        </ul>
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+</form>

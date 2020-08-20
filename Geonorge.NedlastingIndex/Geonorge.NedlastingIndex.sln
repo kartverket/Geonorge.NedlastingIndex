@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geonorge.NedlastingIndex", "Geonorge.NedlastingIndex.csproj", "{A9B8B536-E814-4F1C-8824-144589F7C6AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geonorge.NedlastingIndex", "Geonorge.NedlastingIndex.csproj", "{A9B8B536-E814-4F1C-8824-144589F7C6AB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SearchApp", "..\SearchApp\SearchApp.csproj", "{FB02A9BD-2F58-41AC-BAD6-CFAB6698DF35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{A9B8B536-E814-4F1C-8824-144589F7C6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9B8B536-E814-4F1C-8824-144589F7C6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9B8B536-E814-4F1C-8824-144589F7C6AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB02A9BD-2F58-41AC-BAD6-CFAB6698DF35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB02A9BD-2F58-41AC-BAD6-CFAB6698DF35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB02A9BD-2F58-41AC-BAD6-CFAB6698DF35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB02A9BD-2F58-41AC-BAD6-CFAB6698DF35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
