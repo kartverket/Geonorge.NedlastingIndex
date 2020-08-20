@@ -11,6 +11,6 @@ namespace Geonorge.NedlastingIndex.Services
 {
     public interface ISearchService
     {
-        List<Dataset> Search(SearchParameters searchParameters);
+        SearchResult Search(SearchParameters searchParameters);
     }
 }

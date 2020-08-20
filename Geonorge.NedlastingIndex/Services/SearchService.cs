@@ -19,7 +19,7 @@ namespace Geonorge.NedlastingIndex.Services
             _client = new ElasticClient(settings);
         }
 
-        public List<Dataset> Search(SearchParameters searchParameters)
+        public SearchResult Search(SearchParameters searchParameters)
         {
             int size = 10000;
             List<Dataset> datasets = new List<Dataset>();
@@ -69,7 +69,7 @@ namespace Geonorge.NedlastingIndex.Services
                     )
 
                 .Aggregations(a => a
-                    .Nested("capabilitiesGeneral", n => n
+                    .Nested("facets", n => n
                     .Path(p => p.Files)
                     .Aggregations(a => a
                         .Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
@@ -78,17 +78,42 @@ namespace Geonorge.NedlastingIndex.Services
                         .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
                         )
                     )
-                    .Terms("capabilitiesMetadata", t => t.Field(s => s.MetadataUuid).Size(size)
-                    .Aggregations(b => b
-                    .Nested("files", nn => nn
-                    .Path(pp => pp.Files).Aggregations(aa => aa
-                    .Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
-                    .Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
-                    .Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
-                    .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
-                    ))))
+                    //.Terms("capabilitiesMetadata", t => t.Field(s => s.MetadataUuid).Size(size)
+                    //.Aggregations(b => b
+                    //.Nested("files", nn => nn
+                    //.Path(pp => pp.Files).Aggregations(aa => aa
+                    //.Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
+                    //.Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
+                    //.Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
+                    //.Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
+                    //))))
                 )
             );
+            
+            SingleBucketAggregate facets = (SingleBucketAggregate)searchResponse.Aggregations["facets"];
+
+            List<Facet> facetResult = new List<Facet>();
+
+            for (int f = 0; f < facets.Keys.Count(); f++)
+            {
+                string key = facets.Keys.ElementAt(f);
+
+                Facet facet = new Facet(key);
+
+                BucketAggregate bucketAggregate = (BucketAggregate)facets.Values.ElementAt(f);
+                var items= bucketAggregate.Items;
+                foreach(KeyedBucket<object> bucked in items) 
+                {
+                    var facetCount = (int)bucked.DocCount;
+                    var facetValue = bucked.Key.ToString();
+
+                    facet.FacetResults.Add(new Facet.FacetValue(facetValue, facetCount));
+                }
+
+                facetResult.Add(facet);
+            }
+
+            SearchResult searchResult = new SearchResult();
 
             foreach (var hit in searchResponse.Hits)
             {
@@ -105,7 +130,10 @@ namespace Geonorge.NedlastingIndex.Services
                 datasets.Add(dataset);
             }
 
-            return datasets;
+            searchResult.Datasets = datasets;
+            searchResult.Facets = facetResult;
+
+            return searchResult;
         }
 
     }

@@ -21,12 +21,12 @@ namespace Geonorge.NedlastingIndex.Controllers
         }
 
         [HttpPost]
-        public List<Dataset> Get([FromBody] SearchParameters searchParameters) 
+        public SearchResult Get([FromBody] SearchParameters searchParameters) 
         {
             return _searchService.Search(searchParameters);
         }
 
-        public List<Dataset> Get()
+        public SearchResult Get()
         {
             return _searchService.Search(new SearchParameters());
         }
