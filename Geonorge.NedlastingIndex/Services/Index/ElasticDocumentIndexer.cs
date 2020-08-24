@@ -41,6 +41,7 @@ namespace Geonorge.NedlastingIndex.Services.Index
             Log.Debug("Create index " + _appSettings.ElasticSearchIndexName);
 
             var createIndexResponse = _client.Indices.Create(_appSettings.ElasticSearchIndexName, c => c
+                    .Settings(s => s.Setting("max_inner_result_window", 10000))
                     .Map<Dataset>(m => m
                         .AutoMap()
                         .Properties(ps => ps
