@@ -47,7 +47,7 @@
             <td valign="top">
                 @{
                     var facets = Model.model.Property("facets");
-                    foreach (var facet in facets.Value)
+                    foreach (var facet in facets.Value.OrderByDescending(o => o.SelectToken("facetField") + "s"))
                     {
                         var facetField = facet.SelectToken("facetField") + "s";
                         var facetResults = facet.SelectToken("facetResults");
