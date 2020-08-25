@@ -33,22 +33,22 @@ namespace Geonorge.NedlastingIndex.Services
 
             if (coverageTypes != null && coverageTypes.Length > 0)
             {
-                filters.Add(nq => nq.Terms(m0 => m0.Field(f0 => f0.Files.First().CoverageType).Terms(coverageTypes)));
+                filters.Add(nq => nq.Terms(m0 => m0.Field("file.coverageType").Terms(coverageTypes)));
             }
 
             if (areas != null && areas.Length > 0)
             {
-                filters.Add(nq => nq.Terms(m1 => m1.Field(f1 => f1.Files.First().Area).Terms(areas)));
+                filters.Add(nq => nq.Terms(m1 => m1.Field("file.area").Terms(areas)));
             }
 
             if (projections != null && projections.Length > 0)
             {
-                filters.Add(nq => nq.Terms(m2 => m2.Field(f2 => f2.Files.First().Projection).Terms(projections)));
+                filters.Add(nq => nq.Terms(m2 => m2.Field("file.projection").Terms(projections)));
             }
 
             if (formats != null && formats.Length > 0)
             {
-                filters.Add(nq => nq.Terms(m3 => m3.Field(f3 => f3.Files.First().Format).Terms(formats)));
+                filters.Add(nq => nq.Terms(m3 => m3.Field("file.format").Terms(formats)));
             }
 
             if (!string.IsNullOrEmpty(text))
@@ -62,7 +62,7 @@ namespace Geonorge.NedlastingIndex.Services
                     .Value(text)
                 )
                 && q.Nested(n => n
-                        .InnerHits(ih => ih.From(0).Size(100))
+                        .InnerHits(ih => ih.From(0).Size(size))
                         .Path(b => b.Files)
                         .Query(nq => nq.Bool(bq => bq.Filter(filters))
 
@@ -74,21 +74,12 @@ namespace Geonorge.NedlastingIndex.Services
                     .Nested("facets", n => n
                     .Path(p => p.Files)
                     .Aggregations(a => a
-                        .Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
-                        .Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
-                        .Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
-                        .Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
+                        .Terms("coverageType", t => t.Field("file.coverageType").Size(size))
+                        .Terms("area", t => t.Field("file.area").Size(size))
+                        .Terms("projection", t => t.Field("file.projection").Size(size))
+                        .Terms("format", t => t.Field("file.format").Size(size))
                         )
                     )
-                    //.Terms("capabilitiesMetadata", t => t.Field(s => s.MetadataUuid).Size(size)
-                    //.Aggregations(b => b
-                    //.Nested("files", nn => nn
-                    //.Path(pp => pp.Files).Aggregations(aa => aa
-                    //.Terms("coverageType", t => t.Field(s => s.Files.First().CoverageType).Size(size))
-                    //.Terms("area", t => t.Field(s => s.Files.First().Area).Size(size))
-                    //.Terms("projection", t => t.Field(s => s.Files.First().Projection).Size(size))
-                    //.Terms("format", t => t.Field(s => s.Files.First().Format).Size(size))
-                    //))))
                 )
             );
             
@@ -100,19 +91,23 @@ namespace Geonorge.NedlastingIndex.Services
             {
                 string key = facets.Keys.ElementAt(f);
 
+
                 Facet facet = new Facet(key);
 
-                BucketAggregate bucketAggregate = (BucketAggregate)facets.Values.ElementAt(f);
-                var items= bucketAggregate.Items;
-                foreach(KeyedBucket<object> bucked in items) 
+                BucketAggregate bucketAggregate = facets.Values.ElementAt(f) as BucketAggregate;
+                if (bucketAggregate != null) 
                 {
-                    var facetCount = (int)bucked.DocCount;
-                    var facetValue = bucked.Key.ToString();
+                    var items= bucketAggregate.Items;
+                    foreach(KeyedBucket<object> bucked in items) 
+                    {
+                        var facetCount = (int)bucked.DocCount;
+                        var facetValue = bucked.Key.ToString();
 
-                    facet.FacetResults.Add(new Facet.FacetValue(facetValue, facetCount));
+                        facet.FacetResults.Add(new Facet.FacetValue(facetValue, facetCount));
+                    }
+
+                    facetResult.Add(facet);
                 }
-
-                facetResult.Add(facet);
             }
 
             SearchResult searchResult = new SearchResult();
