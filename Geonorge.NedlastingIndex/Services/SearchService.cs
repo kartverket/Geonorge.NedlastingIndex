@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Geonorge.NedlastingIndex.Controllers;
 using Geonorge.NedlastingIndex.Models;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Nest;
 
@@ -15,6 +16,10 @@ namespace Geonorge.NedlastingIndex.Services
         public SearchService(AppSettings appSettings)
         {
             var settings = new ConnectionSettings(new Uri(appSettings.ElasticSearchHostname)).DefaultIndex(appSettings.ElasticSearchIndexName);
+
+            settings.EnableDebugMode(); settings.DisableDirectStreaming();
+            settings.PrettyJson();
+
 
             _client = new ElasticClient(settings);
         }
@@ -82,31 +87,36 @@ namespace Geonorge.NedlastingIndex.Services
                     )
                 )
             );
-            
-            SingleBucketAggregate facets = (SingleBucketAggregate)searchResponse.Aggregations["facets"];
 
             List<Facet> facetResult = new List<Facet>();
 
-            for (int f = 0; f < facets.Keys.Count(); f++)
-            {
-                string key = facets.Keys.ElementAt(f);
+            if (areas == null && coverageTypes == null && projections == null && formats == null) 
+            { 
+            
+                SingleBucketAggregate facets = (SingleBucketAggregate)searchResponse.Aggregations["facets"];
 
 
-                Facet facet = new Facet(key);
-
-                BucketAggregate bucketAggregate = facets.Values.ElementAt(f) as BucketAggregate;
-                if (bucketAggregate != null) 
+                for (int f = 0; f < facets.Keys.Count(); f++)
                 {
-                    var items= bucketAggregate.Items;
-                    foreach(KeyedBucket<object> bucked in items) 
+                    string key = facets.Keys.ElementAt(f);
+
+
+                    Facet facet = new Facet(key);
+
+                    BucketAggregate bucketAggregate = facets.Values.ElementAt(f) as BucketAggregate;
+                    if (bucketAggregate != null) 
                     {
-                        var facetCount = (int)bucked.DocCount;
-                        var facetValue = bucked.Key.ToString();
+                        var items= bucketAggregate.Items;
+                        foreach(KeyedBucket<object> bucked in items) 
+                        {
+                            var facetCount = (int)bucked.DocCount;
+                            var facetValue = bucked.Key.ToString();
 
-                        facet.FacetResults.Add(new Facet.FacetValue(facetValue, facetCount));
+                            facet.FacetResults.Add(new Facet.FacetValue(facetValue, facetCount));
+                        }
+
+                        facetResult.Add(facet);
                     }
-
-                    facetResult.Add(facet);
                 }
             }
 
@@ -119,8 +129,53 @@ namespace Geonorge.NedlastingIndex.Services
                 dataset.MetadataUuid = hit.Source.MetadataUuid;
                 dataset.Title = hit.Source.Title;
 
-                if (hit.InnerHits.Count > 0)
+                if (hit.InnerHits.Count > 0) {
+                    if (facetResult.Count == 0) 
+                    {
+                        facetResult.Add(new Facet("area"));
+                        facetResult.Add(new Facet("coverageType"));
+                        facetResult.Add(new Facet("format"));
+                        facetResult.Add(new Facet("projection"));
+                    }
+
+                    var innerhits = hit.InnerHits["file"].Documents<File>();
+
+                    foreach (var innerhit in innerhits) 
+                    {
+                        var coverageType = innerhit.CoverageType;
+                        var facetCoverage = facetResult[1].FacetResults.Where(f => f.Name == coverageType).FirstOrDefault();
+                        if (facetCoverage == null)
+                            facetResult[1].FacetResults.Add(new Facet.FacetValue { Name = coverageType, Count = 1 });
+                        else
+                            facetResult[1].FacetResults.Where(p => p.Name == coverageType).Select(u => { u.Count = u.Count + 1; return u; }).ToList();
+
+
+                        var area = innerhit.Area;
+                        var facetArea = facetResult[0].FacetResults.Where(f => f.Name == area).FirstOrDefault();
+                        if (facetArea == null)
+                            facetResult[0].FacetResults.Add(new Facet.FacetValue { Name = area, Count = 1 });
+                        else
+                            facetResult[0].FacetResults.Where(p => p.Name == area).Select(u => { u.Count = u.Count + 1; return u; }).ToList();
+
+                        var format = innerhit.Format;
+                        var facetFormat = facetResult[2].FacetResults.Where(f => f.Name == format).FirstOrDefault();
+                        if (facetFormat == null)
+                            facetResult[2].FacetResults.Add(new Facet.FacetValue { Name = format, Count = 1 });
+                        else
+                            facetResult[2].FacetResults.Where(p => p.Name == format).Select(u => { u.Count = u.Count + 1; return u; }).ToList();
+
+                        var projection = innerhit.Projection;
+                        var facetProjection = facetResult[3].FacetResults.Where(f => f.Name == projection).FirstOrDefault();
+                        if (facetProjection == null)
+                            facetResult[3].FacetResults.Add(new Facet.FacetValue { Name = projection, Count = 1 });
+                        else
+                            facetResult[3].FacetResults.Where(p => p.Name == projection).Select(u => { u.Count = u.Count + 1; return u; }).ToList();
+
+
+                    }
+
                     dataset.Files.AddRange(hit.InnerHits["file"].Documents<File>());
+                }
                 else
                     dataset.Files.AddRange(hit.Source.Files);
 
