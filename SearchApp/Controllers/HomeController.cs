@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Geonorge.NedlastingIndex;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -16,10 +17,12 @@ namespace SearchApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly AppSettings _appSettings;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, AppSettings appSettings)
         {
             _logger = logger;
+            _appSettings = appSettings;
         }
 
         public async Task<IActionResult> IndexAsync()
@@ -28,7 +31,7 @@ namespace SearchApp.Controllers
             var jObject = JRaw.FromObject(search);
 
             JObject data;
-            var url = "https://localhost:5001/api/search";
+            var url = _appSettings.SearchApiUrl;
             using (var httpClient = new HttpClient())
             {
                 using (var response = await httpClient.GetAsync(url))
@@ -52,7 +55,7 @@ namespace SearchApp.Controllers
         public async Task<IActionResult> SearchAsync(string text, string[] areas, string[] projections, string[] formats, string[] coverageTypes)
         {
             JObject data;
-            var url = "https://localhost:5001/api/search";
+            var url = _appSettings.SearchApiUrl;
 
             //var jObject = JRaw.Parse(@"{""text"": ""FKB - Buildings"", ""coveragetypes"": [""fylke""], ""areas"": [""11""],""projections"": [""25832""], ""formats"": [""SOSI"", ""GML""]}");
 
